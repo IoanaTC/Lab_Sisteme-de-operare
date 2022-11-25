@@ -1,0 +1,29 @@
+// cd sys/kern && make syscalls
+// se genereaza fisierele c aferente in sys/sys si sys/kern
+
+•/sys/kern/syscalls.c – adaugarea denumirii functiei in tabela syscallnames
+
+• /sys/sys/syscallargs.h – definitia structurii ce va contine argumentele
+functiei sistem
+        struct sys_khello_args {
+        syscallarg ( const char *) msg ;
+        };
+
+• /sys/sys/syscall.h – definirea noului ID
+# define SYS_khello 331
+
+
+•declaratia functiei are loc tot in /sys/sys/syscallargs.h :
+
+int
+sys_khello(struct proc *p, void *v, register_t *retval)
+{
+    struct sys_khello_args *uap = v;
+    char *kmsg = malloc(120, M_TEMP, M_WAITOK);
+
+    copyinstr(SCARG(uap, msg), kmsg, 100, NULL);
+    write(1, kmsg, 100);
+
+    free(kmsg, M_TEMP, 120);
+    return 0;
+}
